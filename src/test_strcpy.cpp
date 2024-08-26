@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/22 13:18:47 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/26 14:38:05 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ char *ptr_ft, char *ptr_orig, char *real_ptr_ft, char *real_ptr_orig, int &nbr)
 		std::cerr << "Error trying to create/modify the file\n";
 		return ;
 	}
-		file << "TEST CASE NUMBER " << nbr << ".\n\n";
+	file << "TEST CASE NUMBER " << nbr << ".\n\n";
 	if (nbr == 4)
 	{
 		file << "YOUR FT_STRCPY FUNCTION DIDN'T CRASH WHEN IT SHOULD CRASH.\n\n";

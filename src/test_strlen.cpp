@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/21 22:48:02 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/26 14:37:47 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static void	create_log(size_t &result_ft, size_t &result_orig, int &nbr)
 		std::cerr << "Error trying to create/modify the file\n";
 		return ;
 	}
-		file << "TEST CASE NUMBER " << nbr << ".\n\n";
+	file << "TEST CASE NUMBER " << nbr << ".\n\n";
 	if (nbr == 4)
 	{
 		file << "YOUR FT_STRLEN FUNCTION DIDN'T CRASH WHEN IT SHOULD CRASH.\n\n";
