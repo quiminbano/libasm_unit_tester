@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/26 16:47:57 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/26 17:46:24 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,10 +122,14 @@ static void	strdup_wrapper(Test &test, char const *str)
 		test.result_orig = NULL;
 		test.null_ft = true;
 	}
-	if (test.null_orig == false)
+	if (test.null_orig == false && test.result_orig)
 		test.str_orig = test.result_orig;
-	if (test.null_ft == false)
+	if (test.null_ft == false && test.result_ft)
 		test.str_ft = test.result_ft;
+	if (test.result_orig)
+		free(test.result_orig);
+	if (test.result_ft)
+		free(test.result_ft);
 }
 
 static void	process_test(char const *nbr_str)
