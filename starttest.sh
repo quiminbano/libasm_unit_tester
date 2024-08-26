@@ -13,7 +13,7 @@ function run_test_function()
 		mkdir -p outputs
 	fi
 	echo -e "\033[1;37m\nft_$1\033[0m"
-	if c++ -Wall -Wextra -Werror -Wno-nonnull -arch x86_64 -std=c++11 \
+	if c++ -Wall -Wextra -Werror -Wno-nonnull -std=c++11 \
 	src/test_"$1".cpp -Iinclude -L.. -lasm -o \
 	outputs/test_"$1" &> /dev/null ; then
 		for i in $(seq 1 "$2"); do
@@ -30,7 +30,7 @@ function run_test_function()
 function run_mandatory()
 {
 	individualTests=("strlen" "strcpy" "strcmp" "write" "read" "strdup")
-	numberOftestsPerTest=(5 5 10 4 1 1)
+	numberOftestsPerTest=(5 5 10 5 1 1)
 	index=0
 	for instruction in "${individualTests[@]}"; do
 		run_test_function "$instruction" "${numberOftestsPerTest[$index]}"
@@ -76,7 +76,7 @@ function detect_test()
 	globalInstructions=("all" "mandatory" "bonus")
 	individualTests=("strlen" "strcpy" "strcmp" "write" "read" "strdup" \
 	"atoi_base" "list_size" "list_push_front" "list_sort" "list_delete_if")
-	numberOftestsPerTest=(5 5 10 4 1 1 1 1 1 1 1)
+	numberOftestsPerTest=(5 5 10 5 1 1 1 1 1 1 1)
 	isInGlobal=false
 	testName=""
 	index=0
