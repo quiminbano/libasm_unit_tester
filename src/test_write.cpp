@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/26 10:47:14 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/26 11:30:15 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,6 @@ static void	process_test(char const *nbr_str)
 		break;
 	case 3:
 		write_wrapper(-1, "Hello, World\n", 13, test);
-		errno = 0;
 		break;
 	case 4:
 		write_wrapper(1, nullptr, 13, test);
