@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/27 11:32:22 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:09:54 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <sstream>
 #include <cstring>
 #include <csignal>
+#include <limits>
 #include "colors.hpp"
 extern "C"
 {
@@ -36,46 +37,36 @@ static void	signal_handler(int sig)
 	test_status_addr = get_status();
 	if (sig == SIGSEGV && !(*test_status_addr))
 		std::cout << YELLOW << "[CRASH]" << RESET " -> " << RED << "[KO]" << RESET << "\n";
-	else if (sig == SIGSEGV && (*test_status_addr) == 1)
-		std::cout << YELLOW << "[CRASH], " << RESET;
-	else if (sig == SIGSEGV && (*test_status_addr) == 2)
+	else
 		std::cout << YELLOW << "[CRASH]" << RESET " -> " << GREEN << "[OK]\n" << RESET;
 	std::exit(0);
 }
 
-static void	create_log(int &nbr, int &result_orig, int &result_ft)
+static void	create_log(int &nbr, int &expected, int &to_test, std::string &number_str, std::string &base_str)
 {
 	std::ofstream		file;
 	std::ostringstream	oss;
 
-	if (nbr <= 7)
-		oss << "logs/ft_strcmp" << nbr << ".txt";
-	else if (nbr == 8)
-		oss << "logs/ft_strcmp" << 7 << ".txt";
-	else if (nbr == 10)
-		oss << "logs/ft_strcmp" << 8 << ".txt";
+	oss << "logs/ft_atoi_base" << nbr << ".txt";
 	file.open(oss.str(), std::ios_base::out);
 	if (file.fail())
 	{
 		std::cerr << "Error trying to create/modify the file\n";
 		return ;
 	}
-	if (nbr <= 7)
-		file << "TEST CASE NUMBER " << nbr << ".\n\n";
-	else if (nbr == 8)
-		file << "TEST CASE NUMBER " << 7 << ".\n\n";
-	else if (nbr == 10)
-		file << "TEST CASE NUMBER " << 8 << ".\n\n";
-	if (nbr == 8 || nbr == 10)
+	file << "TEST CASE NUMBER " << nbr << ".\n\n";
+	if (nbr == 26 || nbr == 27)
 	{
-		file << "YOUR FT_STRCMP FUNCTION DIDN'T CRASH WHEN IT SHOULD CRASH.\n\n";
+		file << "YOUR FT_ATOI_BASE FUNCTION DIDN'T CRASH WHEN IT SHOULD CRASH.\n\n";
 		file << "REMEMBER THAT OVERPROTECTION OF YOUR FUNCTIONS MAKES MORE DIFFICULT FOR YOU TO\n";
 		file << "DEBUG YOUR CODE IN CASE OF AN ERROR.\n";
 	}
 	else
 	{
-		file << "YOUR FT_STRCMP GOT AS RESULT: " << result_ft << "\n";
-		file << "THE ORIGINAL ONE GETS: " << result_orig << "\n";
+		file << "YOUR FT_ATOI_BASE GOT AS RESULT: " << to_test << '\n';
+		file << "IT SHOULD GET: " << expected << '\n';
+		file << "THE STRING PASSED AS NUMBER WAS: " << number_str << '\n';
+		file << "THE STRING PASSED AS BASE WAS: " << base_str << '\n';
 	}
 	file.close();
 	return ;
@@ -83,98 +74,140 @@ static void	create_log(int &nbr, int &result_orig, int &result_ft)
 
 static void	print_test_and_test_number(int &nbr)
 {
-	if (nbr <= 7)
-		std::cout << "Test " << nbr << ": ";
-	else if (nbr == 9)
-		std::cout << "Test " << 8 << ": ";
-	if (nbr == 7 || nbr == 9)
-		std::cout << "ORIGINAL: ";
-	if (nbr == 8 | nbr == 10)
-		std::cout << "YOURS: ";
+	std::cout << "Test " << nbr << ": ";
+}
+
+static void	assert_eq(int expected, const void *number, const void *base, int nbr)
+{
+	int			to_test;
+	std::string	number_str;
+	std::string	base_str;
+
+	number_str = "";
+	base_str = "";
+	if (nbr == 26 || nbr == 27)
+		(*(get_status())) = 1;
+	to_test = ft_atoi_base((char *)(number), (char *)(base));
+	if (number && base)
+	{
+		number_str = (char *)number;
+		base_str = (char *)base;
+	}
+	if ((nbr == 26 || nbr == 27))
+	{
+		std::cout << YELLOW << "[NO-CRASH]" << RESET << " -> " << RED << "[KO]" << RESET << '\n';
+		create_log(nbr, expected, to_test, number_str, base_str);
+	}
+	else if (expected != to_test)
+	{
+		std::cout << RED << "[KO]" << RESET << '\n';
+		create_log(nbr, expected, to_test, number_str, base_str);
+	}
+	else
+		std::cout << GREEN << "[OK]" << RESET << '\n';
 }
 
 static void	process_test(char const *nbr_str)
 {
-	int			nbr;
-	int			*ptr;
-	int			result_orig;
-	int			result_ft;
-	bool		is_correct;
+	int	nbr;
 
 	signal(SIGSEGV, &signal_handler);
-	nbr = std::stoi(nbr_str);
-	result_orig = 0;
-	result_ft = 0;
-	is_correct = false;
+	try
+	{
+		nbr = std::stoi(nbr_str);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		return ;
+	}
 	print_test_and_test_number(nbr);
 	switch (nbr)
 	{
 	case 1:
-		result_ft = ft_strcmp("Hello, World\n", "Hello, World\n");
-		result_orig = std::strcmp("Hello, World\n", "Hello, World\n");
-		is_correct = (result_ft == 0 && result_orig == 0);
+		assert_eq(2, "10", "01", nbr);
 		break;
 	case 2:
-		result_ft = ft_strcmp("hello, World\n", "Hello, World\n");
-		result_orig = std::strcmp("hello, World\n", "Hello, World\n");
-		is_correct = (result_ft > 0 && result_orig > 0);
+		assert_eq(-55, "  ++---AAaAAA", "aA", nbr);
 		break;
 	case 3:
-		result_ft = ft_strcmp("\0hello, World\n", "\0Hello, World\n");
-		result_orig = std::strcmp("\0hello, World\n", "\0Hello, World\n");
-		is_correct = (result_ft == 0 && result_orig == 0);
+		assert_eq(55, "  ++--AAaAAA", "aA", nbr);
 		break;
 	case 4:
-		result_ft = ft_strcmp("Hello, World\n", "Iello, World\n");
-		result_orig = std::strcmp("Hello, World\n", "Iello, World\n");
-		is_correct = (result_ft < 0 && result_orig < 0);
+		assert_eq(55, "  ++--AAaAAA124", "aA", nbr);
 		break;
 	case 5:
-		result_ft = ft_strcmp("Hello, World\n", "Hello, World\nini");
-		result_orig = std::strcmp("Hello, World\n", "Hello, World\nini");
-		is_correct = (result_ft < 0 && result_orig < 0);
+		assert_eq(0, "\0  ++--AAaAAA124", "aA", nbr);
 		break;
 	case 6:
-		result_ft = ft_strcmp("Hello, World\n\0a", "Hello, World\n\0and");
-		result_orig = std::strcmp("Hello, World\n\0a", "Hello, World\n\0and");
-		is_correct = (result_ft == 0 && result_orig == 0);
+		assert_eq(std::numeric_limits<int>::max(), "  ++--01111111111111111111111111111111", "01", nbr);
 		break;
 	case 7:
-		ptr = get_status();
-		*ptr = 1;
-		result_orig = std::strcmp("Hello\n", nullptr);
+		assert_eq(std::numeric_limits<int>::min(), "  ++--10000000000000000000000000000000", "01", nbr);
 		break;
 	case 8:
-		ptr = get_status();
-		*ptr = 2;
-		result_ft = ft_strcmp("Hello\n", nullptr);
+		assert_eq(511, "0777---", "01234567", nbr);
 		break;
 	case 9:
-		ptr = get_status();
-		*ptr = 1;
-		result_orig = std::strcmp(nullptr, "Hello\n");
+		assert_eq(511, "0...---", "0123456.", nbr);
 		break;
 	case 10:
-		ptr = get_status();
-		*ptr = 2;
-		result_ft = ft_strcmp(nullptr, "Hello\n");
+		assert_eq(511, "/...---", "/123456.", nbr);
+		break;
+	case 11:
+		assert_eq(80383, "/234...---", "/123456.", nbr);
+		break;
+	case 12:
+		assert_eq(-10, "--++++-ba", "abcdefghij", nbr);
+		break;
+	case 13:
+		assert_eq(2024, "cace", "abcdefghij", nbr);
+		break;
+	case 14:
+		assert_eq(7038990, "madonna", "abcdefgmon", nbr);
+		break;
+	case 15:
+		assert_eq(0, "madonna", "0123456789", nbr);
+		break;
+	case 16:
+		assert_eq(2050, "2050", "0123456789", nbr);
+		break;
+	case 17:
+		assert_eq((std::numeric_limits<int>::min() + 2), "2147483650", "0123456789", nbr);
+		break;
+	case 18:
+		assert_eq(1958645160, "HIVE_HELSINKI", "VBCDEFGHIJKLMNS_", nbr);
+		break;
+	case 19:
+		assert_eq(0, "HIVE_HELSINKI", "0123456789ABCDEF", nbr);
+		break;
+	case 20:
+		assert_eq(14, "E_HELSINKI", "0123456789ABCDEF", nbr);
+		break;
+	case 21:
+		assert_eq(0, "100", "010", nbr);
+		break;
+	case 22:
+		assert_eq(0, "100", "   01", nbr);
+		break;
+	case 23:
+		assert_eq(0, "100", "\t\t\t01", nbr);
+		break;
+	case 24:
+		assert_eq(0, "100", "0     1", nbr);
+		break;
+	case 25:
+		assert_eq(0, "100", "01+++", nbr);
+		break;
+	case 26:
+		assert_eq(0, nullptr, "01", nbr);
+		break;
+	case 27:
+		assert_eq(0, "100", nullptr, nbr);
 		break;
 	default:
-		std::cerr << "Error\n";
+		std::cerr << "Error" << '\n';
 		break;
-	}
-	if (nbr == 8 || nbr == 10)
-	{
-		std::cout << YELLOW << "[NO-CRASH]" << RESET " -> ";
-		std::cout << RED << "[KO]" << RESET << "\n";
-		create_log(nbr, result_orig, result_ft);
-	}
-	else if (is_correct == true)
-		std::cout << GREEN << "[OK]" << RESET << "\n";
-	else
-	{
-		std::cout << RED << "[KO]" << RESET << "\n";
-		create_log(nbr, result_orig, result_ft);
 	}
 }
 

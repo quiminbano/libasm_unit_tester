@@ -49,7 +49,7 @@ function run_bonus()
 {
 	individualTests=("atoi_base" "list_size" "list_push_front" "list_sort" \
 	"list_delete_if")
-	numberOftestsPerTest=(1 1 1 1 1)
+	numberOftestsPerTest=(27 1 1 1 1)
 	index=0
 	for instruction in "${individualTests[@]}"; do
 		run_test_function "$instruction" "${numberOftestsPerTest[$index]}"
@@ -83,7 +83,7 @@ function detect_test()
 	globalInstructions=("all" "mandatory" "bonus")
 	individualTests=("strlen" "strcpy" "strcmp" "write" "read" "strdup" \
 	"atoi_base" "list_size" "list_push_front" "list_sort" "list_delete_if")
-	numberOftestsPerTest=(5 5 10 5 4 5 1 1 1 1 1)
+	numberOftestsPerTest=(5 5 10 5 4 5 27 1 1 1 1)
 	isInGlobal=false
 	testName=""
 	index=0
