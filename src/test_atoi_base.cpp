@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_strcmp.cpp                                    :+:      :+:    :+:   */
+/*   test_atoi_base.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/27 11:33:56 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:32:22 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,15 +102,7 @@ static void	process_test(char const *nbr_str)
 	bool		is_correct;
 
 	signal(SIGSEGV, &signal_handler);
-	try
-	{
-		nbr = std::stoi(nbr_str);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-		return ;
-	}
+	nbr = std::stoi(nbr_str);
 	result_orig = 0;
 	result_ft = 0;
 	is_correct = false;

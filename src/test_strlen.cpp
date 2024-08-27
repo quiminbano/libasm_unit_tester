@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/26 14:37:47 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:33:23 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,15 @@ static void	process_test(char const *nbr_str)
 	size_t	result_orig;
 
 	signal(SIGSEGV, &signal_handler);
-	nbr = std::stoi(nbr_str);
+	try
+	{
+		nbr = std::stoi(nbr_str);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		return ;
+	}
 	result_ft = 0;
 	result_orig = 0;
 	print_test_and_test_number(nbr);
