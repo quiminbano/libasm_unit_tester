@@ -20,7 +20,7 @@ function run_test_function()
 	else
 		c++ -Wall -Wextra -Werror -Wno-nonnull -Wl,-wrap=malloc -std=c++11 \
 		src/test_"$1".cpp -Iinclude -L.. -lasm -o \
-		outputs/test_"$1"
+		outputs/test_"$1" &> /dev/null
 	fi
 	if [ $? -eq 0 ] ; then
 		for i in $(seq 1 "$2"); do
