@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/26 17:46:24 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:29:41 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,17 @@ static void	create_log(int &nbr, Test &test)
 		std::cerr << "Error trying to create/modify the file\n";
 		return ;
 	}
-	file << "YOUR FT_STRDUP GOT AS RESULT: " << test.str_ft << "\n";
-	file << "THE ORIGINAL ONE GETS: " << test.str_orig << "\n";
+	if (nbr != 5)
+	{
+		file << "YOUR FT_STRDUP GOT AS RESULT: " << test.str_ft << "\n";
+		file << "THE ORIGINAL ONE GETS: " << test.str_orig << "\n";
+	}
+	else
+	{
+		file << "YOUR FT_STRDUP FUNCTION DIDN'T CRASH WHEN IT SHOULD CRASH.\n\n";
+		file << "REMEMBER THAT OVERPROTECTION OF YOUR FUNCTIONS MAKES MORE DIFFICULT FOR YOU TO\n";
+		file << "DEBUG YOUR CODE IN CASE OF AN ERROR.\n";
+	}
 	file.close();
 	return ;
 }
@@ -109,12 +118,21 @@ static void	strdup_wrapper(Test &test, char const *str)
 	if (test.nbr == 5 && !str)
 	{
 		test.result_ft = ft_strdup(str);
+		free(test.result_ft);
 		return ;
 	}
+	if (test.nbr == 3)
+		*(get_status()) = -1;
 	test.result_orig = strdup(str);
+	if (test.nbr == 3)
+		*(get_status()) = 0;
 	if (!test.result_orig)
 		test.null_orig = true;
+	if (test.nbr == 3)
+		*(get_status()) = -1;
 	test.result_ft = ft_strdup(str);
+	if (test.nbr == 3)
+		*(get_status()) = 0;
 	if (!test.result_ft)
 	{
 		if (test.result_orig)
@@ -164,7 +182,6 @@ static void	process_test(char const *nbr_str)
 		strdup_wrapper(test, "");
 		break;
 	case 3:
-		*(get_status()) = -1;
 		strdup_wrapper(test, "Hello, World\n");
 		*(get_status()) = 0;		
 		break;
