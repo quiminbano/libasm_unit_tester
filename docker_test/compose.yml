@@ -2,6 +2,8 @@ version: '3.8'
 services:
   container_test:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: libasm_unit_tester/docker_test/Dockerfile
     command: bash
+    volumes:
+      - ../logs:/app/libasm_unit_tester/logs

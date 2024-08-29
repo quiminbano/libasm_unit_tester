@@ -5,6 +5,8 @@ clang
 
 WORKDIR /app
 
-COPY .. .
+COPY . .
+
+WORKDIR /app/libasm_unit_tester
 
 CMD ["bash"]
