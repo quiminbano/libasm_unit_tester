@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/27 11:29:41 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/29 21:38:47 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <cstring>
 #include <csignal>
 #include <cerrno>
 #include <unistd.h>
@@ -23,6 +22,7 @@
 extern "C"
 {
 	#include "libasm.h"
+	#include <string.h>
 }
 
 struct Test
