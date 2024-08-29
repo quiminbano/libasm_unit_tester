@@ -134,8 +134,18 @@ isFound=false
 create_folder_or_clear_logs
 if [ $# -eq 0 ]; then
 	string1="all"
-elif [ $# -eq 1 ]; then
+elif [ $# -eq 1 ] && [ "$1" != "docker" ]; then
 	string1=$1
+elif [ $# -eq 1 ] && [ "$1" = "docker" ]; then
+	docker compose -f docker_test/compose.yml run container_test \
+	bash starttest.sh
+	docker compose down
+	exit 0
+elif [ $# -eq 2 ] && [ "$1" = "docker" ] && [ "$2" != "docker" ]; then
+	docker compose -f docker_test/compose.yml run container_test \
+	bash starttest.sh "$2"
+	docker compose down
+	exit 0
 else
 	echo "libasmTester: Too many parameters"
 	exit 1
