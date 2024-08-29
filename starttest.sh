@@ -14,11 +14,11 @@ function run_test_function()
 	fi
 	echo -e "\033[1;37m\nft_$1\033[0m"
 	if [ "$1" != "strdup" ]; then
-		c++ -Wall -Wextra -Werror -Wno-nonnull -std=c++11 \
+		clang++ -Wall -Wextra -Werror -Wno-nonnull -std=c++11 \
 		src/test_"$1".cpp -Iinclude -L.. -lasm -o \
 		outputs/test_"$1" &> /dev/null
 	else
-		c++ -Wall -Wextra -Werror -Wno-nonnull -Wl,-wrap=malloc -std=c++11 \
+		clang++ -Wall -Wextra -Werror -Wno-nonnull -Wl,-wrap=malloc -std=c++11 \
 		src/test_"$1".cpp -Iinclude -L.. -lasm -o \
 		outputs/test_"$1" &> /dev/null
 	fi
