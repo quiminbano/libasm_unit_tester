@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/29 21:38:47 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/30 12:24:46 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,21 @@ struct Test
 
 static int	*get_status(void);
 
-extern "C" void *__real_malloc(size_t size);
-
-extern "C" void	*__wrap_malloc(size_t size)
-{
-	if (*(get_status()) == -1)
-		return (NULL);
-	return (__real_malloc(size));
+extern "C" 
+{ 
+	void *__real_malloc(size_t size);
 }
+
+extern "C"
+{
+	void	*__wrap_malloc(size_t size)
+	{
+		if (*(get_status()) == -1)
+			return (NULL);
+		return (__real_malloc(size));
+	}
+}
+
 
 static int	*get_status(void)
 {
