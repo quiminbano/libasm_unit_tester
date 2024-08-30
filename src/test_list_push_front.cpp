@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/30 13:51:18 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/30 16:59:00 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ static void delete_list(t_list **begin, void (*del)(void *))
 		tmp = (*begin);
 		(*begin) = (*begin)->next;
 		del(tmp->data);
-		delete tmp;
+		free(tmp);
 	}
 }
 

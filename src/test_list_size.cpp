@@ -6,7 +6,7 @@
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/30 00:33:05 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/30 16:58:31 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void delete_list(t_list **begin, void (*del)(void *))
 		tmp = (*begin);
 		(*begin) = (*begin)->next;
 		del(tmp->data);
-		delete tmp;
+		free(tmp);
 	}
 }
 
@@ -60,13 +60,9 @@ static void	push_add_front(t_list **begin, void *content, void (*del)(void *))
 	t_list	*new_node;
 
 	tmp = (*begin);
-	try
+	new_node = (t_list *)malloc(sizeof(t_list));
+	if (!new_node)
 	{
-		new_node = new t_list;
-	}
-	catch(const std::bad_alloc &e)
-	{
-		std::cerr << e.what() << '\n';
 		del(content);
 		delete_list(begin, del);
 		std::exit(1);
