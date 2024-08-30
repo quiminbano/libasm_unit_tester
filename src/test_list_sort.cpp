@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_list_push_front.cpp                           :+:      :+:    :+:   */
+/*   test_list_sort.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: corellan <corellan@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:11:47 by corellan          #+#    #+#             */
-/*   Updated: 2024/08/30 13:51:18 by corellan         ###   ########.fr       */
+/*   Updated: 2024/08/30 13:51:07 by corellan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <csignal>
 #include <cstdarg>
 #include <vector>
+#include <functional>
 #include "colors.hpp"
 extern "C"
 {
@@ -25,33 +26,16 @@ extern "C"
 	t_list	*linked_list = NULL;
 }
 
-static int	*get_status(void)
-{
-	static int	test_status = 0;
-
-	return (&test_status);
-}
-
-extern "C" 
-{ 
-	void *__real_malloc(size_t size);
-}
-
-extern "C"
-{
-	void	*__wrap_malloc(size_t size)
-	{
-		if (*(get_status()) == -1)
-			return (NULL);
-		return (__real_malloc(size));
-	}
-}
-
 static void	signal_handler(int sig)
 {
 	if (sig == SIGSEGV)
 		std::cout << YELLOW << "[CRASH]" << RESET " -> " << RED << "[KO]\n" << RESET;
 	std::exit(0);
+}
+
+static int	compare_number(void *a, void *b)
+{
+	return (reinterpret_cast<long>(a) - reinterpret_cast<long>(b));
 }
 
 static void	erase_number(void *nbr)
@@ -76,13 +60,37 @@ static void delete_list(t_list **begin, void (*del)(void *))
 	}
 }
 
+static void	list_push_front(t_list **begin, void *content, void (*del)(void *))
+{
+	t_list	*tmp;
+	t_list	*new_node;
+
+	if (!begin)
+		return ;
+	tmp = (*begin);
+	try
+	{
+		new_node = new t_list;
+	}
+	catch(const std::bad_alloc &e)
+	{
+		std::cerr << e.what() << '\n';
+		del(content);
+		delete_list(begin, del);
+		std::exit(1);
+	}
+	new_node->data = content;
+	new_node->next = tmp;
+	(*begin) = new_node;
+}
+
 template<typename T>
 static void	create_log(std::vector<T> expected, std::vector<T> result, int nbr)
 {
 	std::ofstream		file;
 	std::ostringstream	oss;
 
-	oss << "logs/ft_list_push_front" << nbr << ".txt";
+	oss << "logs/ft_list_sort" << nbr << ".txt";
 	file.open(oss.str(), std::ios_base::out);
 	if (file.fail())
 	{
@@ -90,7 +98,7 @@ static void	create_log(std::vector<T> expected, std::vector<T> result, int nbr)
 		return ;
 	}
 	file << "TEST CASE NUMBER " << nbr << ".\n\n";
-	file << "YOUR FT_LIST_PUSH_FRONT GOT AS RESULT:\n";
+	file << "YOUR FT_LIST_SORT GOT AS RESULT:\n";
 	for (T &i : result)
 		file << i << " -> ";
 	file << "NULL" << '\n';
@@ -140,15 +148,15 @@ static void	assert_eq(t_list **begin, std::vector<std::string> vec, int nbr)
 	std::vector<std::string>	results_list;
 	t_list						*tmp;
 
-	expected = "Hej\nMoi\nHello\n";
+	expected = "Hej\nHello\nMoi\n";
 	to_test = "";
 	tmp = (*begin);
 	while (tmp)
 	{
 		tmp_str.clear();
-		to_test.append(static_cast<char *>(tmp->data));
+		to_test.append((char *)tmp->data);
 		to_test.push_back('\n');
-		tmp_str.append(static_cast<char *>(tmp->data));
+		tmp_str.append((char *)tmp->data);
 		results_list.push_back(tmp_str);
 		tmp = tmp->next;
 	}
@@ -175,12 +183,17 @@ static void	check_special_cases(t_list **begin, int nbr)
 		std::cout << GREEN << "[OK]\n" << RESET;
 }
 
+static int	strcmp_wrapper(void *a, void *b)
+{
+	return (strcmp(static_cast<const char *>(a), static_cast<const char *>(b)));
+}
+
 static void	process_test(char const *nbr_str)
 {
-	int							nbr;
-	char						*str;
-	std::vector<long>			vec_t1 = {0, 1, 2, 5, 10, 100};
-	std::vector<std::string>	vec_t2 = {"Hej", "Moi", "Hello"};
+	int									nbr;
+	char								*str;
+	std::vector<long>					vec_t1 = {0, 1, 2, 5, 10, 100};
+	std::vector<std::string>			vec_t2 = {"Hej", "Hello", "Moi"};
 
 	signal(SIGSEGV, &signal_handler);
 	try
@@ -196,45 +209,46 @@ static void	process_test(char const *nbr_str)
 	switch (nbr)
 	{
 	case 1:
-		ft_list_push_front(&linked_list, (void *)100);
-		ft_list_push_front(&linked_list, (void *)10);
-		ft_list_push_front(&linked_list, (void *)5);
-		ft_list_push_front(&linked_list, (void *)2);
-		ft_list_push_front(&linked_list, (void *)1);
-		ft_list_push_front(&linked_list, (void *)0);
+		list_push_front(&linked_list, (void *)100, &erase_number);
+		list_push_front(&linked_list, (void *)0, &erase_number);
+		list_push_front(&linked_list, (void *)10, &erase_number);
+		list_push_front(&linked_list, (void *)2, &erase_number);
+		list_push_front(&linked_list, (void *)1, &erase_number);
+		list_push_front(&linked_list, (void *)5, &erase_number);
+		ft_list_sort(&linked_list, &compare_number);
 		assert_eq(&linked_list, vec_t1, nbr);
 		delete_list(&linked_list, &erase_number);
 		break;
 	case 2:
-		str = strdup("Hello");
+		str = strdup("Hej");
 		if (!str)
 			return ;
-		ft_list_push_front(&linked_list, str);
+		list_push_front(&linked_list, str, &free);
 		str = strdup("Moi");
 		if (!str)
 		{
 			delete_list(&linked_list, &free);
 			return ;
 		}
-		ft_list_push_front(&linked_list, str);
-		str = strdup("Hej");
+		list_push_front(&linked_list, str, &free);
+		str = strdup("Hello");
 		if (!str)
 		{
 			delete_list(&linked_list, &free);
 			return ;
 		}
-		ft_list_push_front(&linked_list, str);
+		list_push_front(&linked_list, str, &free);
+		ft_list_sort(&linked_list, &strcmp_wrapper);
 		assert_eq(&linked_list, vec_t2, nbr);
 		delete_list(&linked_list, &free);
 		break;
 	case 3:
-		ft_list_push_front(nullptr, (void *)0);
+		list_push_front(nullptr, (void *)0, &erase_number);
+		ft_list_sort(&linked_list, &compare_number);
 		check_special_cases(&linked_list, nbr);
 		break;
 	case 4:
-		*(get_status()) = -1;
-		ft_list_push_front(&linked_list, (void *)88);
-		*(get_status()) = 0;
+		ft_list_sort(&linked_list, nullptr);
 		check_special_cases(&linked_list, nbr);
 		break;
 	default:
